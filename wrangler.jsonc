@@ -1,0 +1,37 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "personal-askbox",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-06-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "SITE_NAME": "个人提问箱",
+    "NEXT_PUBLIC_TURNSTILE_SITE_KEY": ""
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "askbox-db",
+      "database_id": "replace-with-your-d1-database-id"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "ASKBOX_KV",
+      "id": "replace-with-your-kv-id"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "ASKBOX_R2",
+      "bucket_name": "askbox-uploads"
+    }
+  ]
+}
