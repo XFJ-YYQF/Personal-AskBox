@@ -1,25 +1,57 @@
 "use client";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { siteName } from "@/lib/env";
 
+type Theme = "auto" | "light" | "dark";
+
+const THEME_KEY = "mdui-theme";
+
+const nextTheme: Record<Theme, Theme> = {
+  auto: "light",
+  light: "dark",
+  dark: "auto",
+};
+
+const themeLabel: Record<Theme, string> = {
+  auto: "跟随系统",
+  light: "浅色模式",
+  dark: "深色模式",
+};
+
 export function Header({ admin = false }: { admin?: boolean }) {
+  const [theme, setTheme] = useState<Theme>("auto");
+
   useEffect(() => {
     import("@mdui/icons/admin-panel-settings.js");
+    import("@mdui/icons/light-mode.js");
+    import("@mdui/icons/dark-mode.js");
+    import("@mdui/icons/auto-mode.js");
+    import("@mdui/icons/logout.js");
+
+    const saved = localStorage.getItem(THEME_KEY) as Theme | null;
+    if (saved) {
+      setTheme(saved);
+      document.documentElement.className = `mdui-theme-${saved}`;
+    }
   }, []);
+
+  const toggleTheme = () => {
+    const next = nextTheme[theme];
+    setTheme(next);
+    document.documentElement.className = `mdui-theme-${next}`;
+    localStorage.setItem(THEME_KEY, next);
+  };
 
   return (
     <header className="shell topbar">
       <Link href="/" className="brand">
-        <span className="brand-mark">问</span>
+        <mdui-avatar size={40} variant="rounded">
+          <img src="/favicon.ico" alt="logo" />
+        </mdui-avatar>
         <span>{siteName()}</span>
       </Link>
-      {admin ? (
-        <form action="/api/admin/logout" method="post">
-          <mdui-button variant="text" type="submit">退出</mdui-button>
-        </form>
-      ) : (
-        <div style={{display:"flex",gap:4}}>
+      <div style={{display:"flex",gap:4,alignItems:"center"}}>
         <Link href="https://github.com/ayyyyano/Personal-AskBox" target="_blank" rel="noreferrer noopener" style={{display:"flex"}}>
           <mdui-button-icon aria-label="GitHub 项目主页">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 36 36" fill="currentColor">
@@ -27,13 +59,25 @@ export function Header({ admin = false }: { admin?: boolean }) {
             </svg>
           </mdui-button-icon>
         </Link>
-        <Link href="/admin">
-          <mdui-button-icon aria-label="管理后台">
-            <mdui-icon-admin-panel-settings></mdui-icon-admin-panel-settings>
-          </mdui-button-icon>
-        </Link>
-        </div>
-      )}
+        <mdui-button-icon aria-label={themeLabel[theme]} onClick={toggleTheme}>
+          {theme === "auto" && <mdui-icon-light-mode></mdui-icon-light-mode>}
+          {theme === "light" && <mdui-icon-dark-mode></mdui-icon-dark-mode>}
+          {theme === "dark" && <mdui-icon-auto-mode></mdui-icon-auto-mode>}
+        </mdui-button-icon>
+        {admin ? (
+          <form action="/api/admin/logout" method="post" style={{display:"flex"}}>
+            <mdui-button-icon aria-label="退出登录" type="submit">
+              <mdui-icon-logout></mdui-icon-logout>
+            </mdui-button-icon>
+          </form>
+        ) : (
+          <Link href="/admin">
+            <mdui-button-icon aria-label="管理后台">
+              <mdui-icon-admin-panel-settings></mdui-icon-admin-panel-settings>
+            </mdui-button-icon>
+          </Link>
+        )}
+      </div>
     </header>
   );
 }

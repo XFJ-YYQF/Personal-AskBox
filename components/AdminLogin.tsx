@@ -25,8 +25,10 @@ export function AdminLogin() {
 
   return (
     <form className="panel form-stack" onSubmit={submit}>
-      <input name="password" type="password" placeholder="管理员密码" required style={{padding:"10px 12px",border:"1px solid rgb(var(--mdui-color-outline-variant))",borderRadius:8,background:"transparent",color:"inherit",font:"inherit",fontSize:"1rem"}} />
-      <button type="submit" disabled={busy} style={{padding:"10px 24px",border:0,borderRadius:8,background:"rgb(var(--mdui-color-primary))",color:"rgb(var(--mdui-color-on-primary))",font:"inherit",fontSize:"1rem",cursor:"pointer"}}>{busy ? "登录中…" : "登录"}</button>
+      <mdui-text-field name="password" type="password" label="管理员密码" required />
+      <mdui-button type="submit" loading={busy || undefined}>
+        {busy ? "登录中…" : "登录"}
+      </mdui-button>
       {error ? <p style={{color:"rgb(var(--mdui-color-error,179,38,30))",margin:0}}>{error}</p> : null}
     </form>
   );

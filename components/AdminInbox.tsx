@@ -3,6 +3,13 @@
 import { useEffect, useState } from "react";
 import type { Question } from "@/lib/db";
 
+const filterLabels: Record<string, string> = {
+  pending: "待回答",
+  answered: "已回答",
+  published: "已展示",
+  all: "全部问题",
+};
+
 export function AdminInbox() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [status, setStatus] = useState("pending");
@@ -41,9 +48,9 @@ export function AdminInbox() {
   return (
     <section className="admin-layout">
       <div className="row">
-        <mdui-segmented-button-group value={status}>
-          {["pending", "answered", "published", "all"].map((item) => (
-            <mdui-segmented-button
+        <mdui-tabs value={status} full-width style={{width:"100%"}}>
+          {(["pending","answered","published","all"] as const).map((item) => (
+            <mdui-tab
               key={item}
               value={item}
               onClick={() => {
@@ -51,16 +58,16 @@ export function AdminInbox() {
                 load(item);
               }}
             >
-              {item}
-            </mdui-segmented-button>
+              {filterLabels[item]}
+            </mdui-tab>
           ))}
-        </mdui-segmented-button-group>
+        </mdui-tabs>
         {busy ? <mdui-circular-progress /> : null}
       </div>
 
       {questions.map((question) => (
         <article className="admin-card" key={question.id}>
-          <div className="row">
+      <div style={{display:"flex",alignItems:"center",gap:12}}>
             <strong>{question.nickname || "匿名"}</strong>
             <span className="muted">{new Date(question.created_at?.replace(" ", "T") + "Z").toLocaleString()}</span>
           </div>
