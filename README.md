@@ -120,7 +120,8 @@ npm run db:remote  # 初始化远端 D1
 
 ### 后台无法登录
 
-检查 `ADMIN_PASSWORD` 和 `SESSION_SECRET` 是否已通过 `wrangler secret` 设置。
+- 检查 `ADMIN_PASSWORD` 和 `SESSION_SECRET` 是否已通过 `wrangler secret` 设置。
+- 使用 `http://` 而非 `https://` 访问会导致 Cookie 无法写入，请务必通过 `https://` 访问后台。
 
 ### 部署后首页没有公开内容
 
