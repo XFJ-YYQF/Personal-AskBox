@@ -13,7 +13,7 @@
   },
   "vars": {
     "SITE_NAME": "个人提问箱",
-    "NEXT_PUBLIC_TURNSTILE_SITE_KEY": ""
+    "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAADq_TbFIo0fHRcu3"
   },
   "d1_databases": [
     {

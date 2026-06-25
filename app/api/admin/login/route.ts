@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSessionCookie, setSession, verifyPassword } from "@/lib/auth";
 
-export const runtime = "edge";
-
 export async function POST(request: NextRequest) {
   const form = await request.formData();
   const password = String(form.get("password") ?? "");

@@ -65,6 +65,7 @@ export function AdminInbox() {
             <span className="muted">{new Date(question.created_at).toLocaleString()}</span>
           </div>
           <p>{question.content}</p>
+          {question.attachment_key ? <p><img src={`/api/questions/${question.id}/attachment`} alt="附件图片" style={{maxWidth:"100%",maxHeight:320,borderRadius:8,objectFit:"contain"}} /></p> : null}
           {question.answer ? <p className="muted">已答：{question.answer}</p> : null}
           <form
             className="form-stack"

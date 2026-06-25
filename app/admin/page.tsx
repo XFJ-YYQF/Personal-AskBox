@@ -3,8 +3,6 @@ import { AdminInbox } from "@/components/AdminInbox";
 import { Header } from "@/components/Header";
 import { isAdmin } from "@/lib/auth";
 
-export const runtime = "edge";
-
 export default async function AdminPage() {
   const ok = await isAdmin();
   if (!ok) {

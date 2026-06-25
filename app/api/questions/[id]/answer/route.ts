@@ -3,8 +3,6 @@ import { isAdmin } from "@/lib/auth";
 import { answerQuestion } from "@/lib/db";
 import { answerSchema } from "@/lib/validators";
 
-export const runtime = "edge";
-
 export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

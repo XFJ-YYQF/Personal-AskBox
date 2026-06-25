@@ -8,8 +8,6 @@ import { saveAttachment } from "@/lib/r2";
 import { questionSchema } from "@/lib/validators";
 import { verifyTurnstile } from "@/lib/turnstile";
 
-export const runtime = "edge";
-
 function clientIp(request: NextRequest) {
   return request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
 }
