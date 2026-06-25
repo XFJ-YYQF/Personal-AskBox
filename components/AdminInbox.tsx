@@ -62,7 +62,7 @@ export function AdminInbox() {
         <article className="admin-card" key={question.id}>
           <div className="row">
             <strong>{question.nickname || "匿名"}</strong>
-            <span className="muted">{new Date(question.created_at).toLocaleString()}</span>
+            <span className="muted">{new Date(question.created_at?.replace(" ", "T") + "Z").toLocaleString()}</span>
           </div>
           <p>{question.content}</p>
           {question.attachment_key ? <p><img src={`/api/questions/${question.id}/attachment`} alt="附件图片" style={{maxWidth:"100%",maxHeight:320,borderRadius:8,objectFit:"contain"}} /></p> : null}
