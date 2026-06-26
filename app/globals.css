@@ -115,6 +115,10 @@ a {
   padding: 22px 0 54px;
 }
 
+.admin-layout mdui-tabs {
+  --mdui-color-surface: transparent;
+}
+
 .admin-card {
   display: grid;
   gap: 14px;
