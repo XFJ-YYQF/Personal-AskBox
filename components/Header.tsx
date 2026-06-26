@@ -71,7 +71,7 @@ export function Header({ admin = false }: { admin?: boolean }) {
             </mdui-button-icon>
           </form>
         ) : (
-          <Link href="/admin">
+          <Link href="/admin" style={{display:"flex"}}>
             <mdui-button-icon aria-label="管理后台">
               <mdui-icon-admin-panel-settings></mdui-icon-admin-panel-settings>
             </mdui-button-icon>
