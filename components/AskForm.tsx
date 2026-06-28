@@ -18,6 +18,7 @@ export function AskForm({ siteKey }: { siteKey: string }) {
   const [message, setMessage] = useState("");
   const [token, setToken] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [showTurnstile, setShowTurnstile] = useState(false);
   const turnstileRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -25,12 +26,14 @@ export function AskForm({ siteKey }: { siteKey: string }) {
     import("@mdui/icons/alternate-email.js");
     import("@mdui/icons/arrow-forward.js");
     import("@mdui/icons/attachment.js");
+    import("@mdui/icons/location-searching.js");
   }, []);
 
   useEffect(() => {
-    if (!siteKey) return;
+    if (!siteKey || !showTurnstile) return;
     let cancelled = false;
-    const render = () => {
+
+    const renderTurnstile = () => {
       if (cancelled || !turnstileRef.current || !window.turnstile) return;
       window.turnstile.render(turnstileRef.current, {
         sitekey: siteKey,
@@ -38,17 +41,22 @@ export function AskForm({ siteKey }: { siteKey: string }) {
       });
     };
 
+    if (window.turnstile) {
+      renderTurnstile();
+      return;
+    }
+
     const script = document.createElement("script");
     script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
     script.async = true;
     script.defer = true;
-    script.onload = render;
+    script.onload = renderTurnstile;
     document.body.appendChild(script);
     return () => {
       cancelled = true;
       script.remove();
     };
-  }, [siteKey]);
+  }, [showTurnstile, siteKey]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -67,6 +75,8 @@ export function AskForm({ siteKey }: { siteKey: string }) {
       if (response.ok) {
         formEl.reset();
         setFile(null);
+        setShowTurnstile(false);
+        setToken("");
         setMessage("已经投递到收件箱。");
         return;
       }
@@ -90,7 +100,16 @@ export function AskForm({ siteKey }: { siteKey: string }) {
         <mdui-icon-attachment slot="icon"></mdui-icon-attachment>
         {file ? file.name : "图片附件（可选）"}
       </mdui-button>
-      {siteKey ? <div ref={turnstileRef} style={{display:"flex",justifyContent:"center"}} /> : null}
+      {siteKey ? (
+        showTurnstile ? (
+          <div ref={turnstileRef} style={{display:"flex",justifyContent:"center"}} />
+        ) : (
+          <mdui-button variant="outlined" full-width onClick={() => setShowTurnstile(true)}>
+            <mdui-icon-location-searching slot="icon"></mdui-icon-location-searching>
+            完成人机验证
+          </mdui-button>
+        )
+      ) : null}
       <mdui-button type="submit" loading={busy || undefined} full-width>
         <mdui-icon-arrow-forward slot="end-icon"></mdui-icon-arrow-forward>
         发送问题

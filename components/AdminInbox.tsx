@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import type { Question } from "@/lib/db";
-import { AdminSearchBar } from "@/components/AdminSearchBar";
 
 const filterLabels: Record<string, string> = {
   pending: "待回答",
@@ -65,7 +64,6 @@ export function AdminInbox() {
         </mdui-tabs>
         {busy ? <mdui-circular-progress /> : null}
       </div>
-      <AdminSearchBar />
 
       {questions.map((question) => (
         <article className="admin-card" key={question.id}>

@@ -1,5 +1,4 @@
 import { liteClient as algoliasearch } from "algoliasearch/lite";
-import { getEnv } from "./env";
 
 export type SearchResult = {
   id: string;
@@ -12,20 +11,23 @@ export type SearchResult = {
   published_at: string | null;
 };
 
-export function searchClient() {
-  const appId = getEnv("NEXT_PUBLIC_ALGOLIA_APP_ID");
-  const searchKey = getEnv("NEXT_PUBLIC_ALGOLIA_SEARCH_ONLY_API_KEY");
-  if (!appId || !searchKey) return null;
-  return algoliasearch(appId, searchKey);
+const APP_ID = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID ?? "";
+const SEARCH_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_ONLY_API_KEY ?? "";
+const INDEX_NAME = process.env.NEXT_PUBLIC_ALGOLIA_INDEX ?? "";
+
+let client: ReturnType<typeof algoliasearch> | null = null;
+function getClient() {
+  if (!APP_ID || !SEARCH_KEY) return null;
+  if (!client) client = algoliasearch(APP_ID, SEARCH_KEY);
+  return client;
 }
 
 export async function searchQuestions(query: string, filters?: string) {
-  const client = searchClient();
-  const indexName = getEnv("NEXT_PUBLIC_ALGOLIA_INDEX");
-  if (!client || !indexName) return { hits: [] as SearchResult[] };
+  const c = getClient();
+  if (!c || !INDEX_NAME) return { hits: [] as SearchResult[] };
 
-  const results = await client.search<SearchResult>({
-    requests: [{ indexName, query, filters, hitsPerPage: 20 }],
+  const results = await c.search<SearchResult>({
+    requests: [{ indexName: INDEX_NAME, query, filters, hitsPerPage: 20 }],
   });
-  return { hits: (results.results[0] as any)?.hits ?? [] as SearchResult[] };
+  return { hits: (results.results[0] as any)?.hits ?? ([] as SearchResult[]) };
 }

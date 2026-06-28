@@ -1,0 +1,107 @@
+"use client";
+import { useEffect, useState, useCallback } from "react";
+import { searchQuestions, type SearchResult } from "@/lib/algolia";
+import { useSearchParams, useRouter } from "next/navigation";
+import { TimeDisplay } from "@/components/TimeDisplay";
+
+export function SearchView() {
+  const params = useSearchParams();
+  const router = useRouter();
+  const initialQuery = params.get("q") ?? "";
+  const [query, setQuery] = useState(initialQuery);
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [searched, setSearched] = useState(false);
+
+  useEffect(() => {
+    import("@mdui/icons/search.js");
+  }, []);
+
+  const doSearch = useCallback(async (q: string) => {
+    if (!q.trim()) {
+      setResults([]);
+      setSearched(false);
+      return;
+    }
+    setBusy(true);
+    setSearched(true);
+    try {
+      const { hits } = await searchQuestions(q);
+      setResults(hits);
+    } catch (err) {
+      console.error("Search failed:", err);
+    }
+    setBusy(false);
+  }, []);
+
+  useEffect(() => {
+    if (initialQuery) doSearch(initialQuery);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+    window.clearTimeout((onChange as any)._t);
+    (onChange as any)._t = window.setTimeout(() => {
+      doSearch(value);
+      router.replace(`/search?q=${encodeURIComponent(value)}`);
+    }, 300);
+  };
+
+  return (
+    <main className="shell" style={{ paddingTop: 32, paddingBottom: 64 }}>
+      <h1 style={{ fontSize: "2rem", margin: "0 0 24px" }}>搜索问题</h1>
+      <input
+        type="text"
+        value={query}
+        onChange={onChange}
+        placeholder="输入关键词搜索…"
+        autoFocus
+        style={{
+          width: "100%",
+          padding: "12px 16px",
+          borderRadius: 12,
+          border: "1px solid rgb(var(--mdui-color-outline))",
+          background: "rgb(var(--mdui-color-surface-container-high))",
+          color: "rgb(var(--mdui-color-on-surface))",
+          font: "inherit",
+          fontSize: "1rem",
+          outline: "none",
+        }}
+      />
+      {busy ? (
+        <div style={{ display: "flex", justifyContent: "center", padding: 32 }}>
+          <mdui-circular-progress />
+        </div>
+      ) : searched ? (
+        <div style={{ marginTop: 24, display: "grid", gap: 12 }}>
+          {results.length === 0 ? (
+            <p className="muted">没有找到相关问题。</p>
+          ) : (
+            results.map((r) => (
+              <article
+                key={r.id}
+                style={{
+                  padding: 16,
+                  borderRadius: 12,
+                  background: "rgb(var(--mdui-color-surface-container))",
+                }}
+              >
+                <p style={{ margin: "0 0 8px", fontWeight: 500 }}>{r.content}</p>
+                {r.answer ? (
+                  <p style={{ margin: "0 0 8px", fontSize: "0.875rem", color: "rgb(var(--mdui-color-on-surface-variant))" }}>
+                    {r.answer}
+                  </p>
+                ) : null}
+                <span style={{ fontSize: "0.75rem", color: "rgb(var(--mdui-color-on-surface-variant))" }}>
+                  {r.nickname || "匿名"} · {r.published_at ? <TimeDisplay date={r.published_at} /> : r.created_at}
+                </span>
+              </article>
+            ))
+          )}
+        </div>
+      ) : null}
+    </main>
+  );
+}

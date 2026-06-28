@@ -1,7 +1,8 @@
 "use client";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { searchQuestions, type SearchResult } from "@/lib/algolia";
 import { siteName } from "@/lib/env";
+import Link from "next/link";
 
 type Theme = "auto" | "light" | "dark";
 
@@ -21,6 +22,12 @@ const themeLabel: Record<Theme, string> = {
 
 export function Header({ admin = false }: { admin?: boolean }) {
   const [theme, setTheme] = useState<Theme>("auto");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchBusy, setSearchBusy] = useState(false);
+  const dialogRef = useRef<HTMLElement>(null);
+  const searchFieldRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     import("@mdui/icons/admin-panel-settings.js");
@@ -28,6 +35,7 @@ export function Header({ admin = false }: { admin?: boolean }) {
     import("@mdui/icons/dark-mode.js");
     import("@mdui/icons/auto-mode.js");
     import("@mdui/icons/logout.js");
+    import("@mdui/icons/search.js");
 
     const saved = localStorage.getItem(THEME_KEY) as Theme | null;
     if (saved) {
@@ -36,12 +44,42 @@ export function Header({ admin = false }: { admin?: boolean }) {
     }
   }, []);
 
+  useEffect(() => {
+    const el = dialogRef.current;
+    if (!el) return;
+    const handler = () => setSearchOpen(false);
+    el.addEventListener("close", handler);
+    return () => el.removeEventListener("close", handler);
+  }, []);
+
+  useEffect(() => {
+    const el = searchFieldRef.current;
+    if (!el) return;
+    const handler = (e: Event) => setSearchQuery((e.target as any)?.value ?? "");
+    el.addEventListener("input", handler);
+    return () => el.removeEventListener("input", handler);
+  }, []);
+
   const toggleTheme = () => {
     const next = nextTheme[theme];
     setTheme(next);
     document.documentElement.className = `mdui-theme-${next}`;
     localStorage.setItem(THEME_KEY, next);
   };
+
+  const doSearch = useCallback(async (q: string) => {
+    if (!q.trim()) { setSearchResults([]); return; }
+    setSearchBusy(true);
+    try { const { hits } = await searchQuestions(q, admin ? undefined : "status:published"); setSearchResults(hits); } catch {}
+    setSearchBusy(false);
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => doSearch(searchQuery), 300);
+    return () => clearTimeout(t);
+  }, [searchQuery, doSearch]);
+
+  const openSearch = () => { setSearchOpen(true); setSearchQuery(""); setSearchResults([]); };
 
   return (
     <header className="shell topbar">
@@ -59,6 +97,9 @@ export function Header({ admin = false }: { admin?: boolean }) {
             </svg>
           </mdui-button-icon>
         </Link>
+        <mdui-button-icon aria-label="搜索问题" onClick={openSearch}>
+          <mdui-icon-search></mdui-icon-search>
+        </mdui-button-icon>
         <mdui-button-icon aria-label={themeLabel[theme]} onClick={toggleTheme}>
           {theme === "auto" && <mdui-icon-light-mode></mdui-icon-light-mode>}
           {theme === "light" && <mdui-icon-dark-mode></mdui-icon-dark-mode>}
@@ -78,6 +119,30 @@ export function Header({ admin = false }: { admin?: boolean }) {
           </Link>
         )}
       </div>
+
+      <mdui-dialog ref={dialogRef} open={searchOpen || undefined} headline="搜索问题">
+        <mdui-text-field ref={searchFieldRef} value={searchQuery} placeholder="输入关键词…" autofocus>
+          <mdui-icon-search slot="icon"></mdui-icon-search>
+        </mdui-text-field>
+        {searchBusy ? (
+          <div style={{display:"flex",justifyContent:"center",padding:16}}><mdui-circular-progress /></div>
+        ) : searchResults.length > 0 ? (
+          <div style={{maxHeight:"50vh",overflowY:"auto"}}>
+            {searchResults.map(r => (
+              <div key={r.id} style={{padding:"10px 0",borderBottom:"1px solid rgb(var(--mdui-color-outline-variant))"}}>
+                <p style={{margin:"0 0 4px",fontWeight:500}}>{r.content}</p>
+                {r.answer ? <p style={{margin:"0 0 4px",fontSize:"0.875rem",color:"rgb(var(--mdui-color-on-surface-variant))"}}>{r.answer}</p> : null}
+                <span style={{fontSize:"0.75rem",color:"rgb(var(--mdui-color-on-surface-variant))"}}>
+                  {r.nickname || "匿名"} · {r.status === "published" ? (r.published_at ? new Date(r.published_at.replace(" ","T")+"Z").toLocaleDateString() : "") : r.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : searchQuery.trim() ? (
+          <p className="muted">没有找到相关问题。</p>
+        ) : null}
+        <mdui-button slot="action" type="button" onClick={() => setSearchOpen(false)}>关闭</mdui-button>
+      </mdui-dialog>
     </header>
   );
 }
