@@ -36,7 +36,7 @@ export function Footer() {
           <p style={{color:"rgb(var(--mdui-color-on-surface-variant))",fontSize:"0.875rem"}}>最后更新日期：{LAST_UPDATED}</p>
           <TermsContent />
         </div>
-        <mdui-button slot="action" type="button" onClick={() => setTermsOpen(false)}>关闭</mdui-button>
+        <mdui-button slot="action" variant="text" type="button" onClick={() => setTermsOpen(false)}>关闭</mdui-button>
       </mdui-dialog>
 
       <mdui-dialog ref={privacyRef} open={privacyOpen || undefined} headline="隐私政策">
@@ -44,7 +44,7 @@ export function Footer() {
           <p style={{color:"rgb(var(--mdui-color-on-surface-variant))",fontSize:"0.875rem"}}>最后更新日期：{LAST_UPDATED}</p>
           <PrivacyContent />
         </div>
-        <mdui-button slot="action" type="button" onClick={() => setPrivacyOpen(false)}>关闭</mdui-button>
+        <mdui-button slot="action" variant="text" type="button" onClick={() => setPrivacyOpen(false)}>关闭</mdui-button>
       </mdui-dialog>
     </>
   );

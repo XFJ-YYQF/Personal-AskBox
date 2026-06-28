@@ -141,7 +141,7 @@ export function Header({ admin = false }: { admin?: boolean }) {
         ) : searchQuery.trim() ? (
           <p className="muted">没有找到相关问题。</p>
         ) : null}
-        <mdui-button slot="action" type="button" onClick={() => setSearchOpen(false)}>关闭</mdui-button>
+        <mdui-button slot="action" variant="text" type="button" onClick={() => setSearchOpen(false)}>关闭</mdui-button>
       </mdui-dialog>
     </header>
   );

@@ -117,7 +117,7 @@ export function AdminInbox() {
 
       <mdui-dialog ref={confirmRef} open={deleteId !== null ? true : undefined} headline="确认删除">
         <p>确定要删除这个问题吗？关联的图片附件也将被清除，此操作不可撤销。</p>
-        <mdui-button slot="action" type="button" onClick={() => setDeleteId(null)}>取消</mdui-button>
+        <mdui-button slot="action" variant="text" type="button" onClick={() => setDeleteId(null)}>取消</mdui-button>
         <mdui-button slot="action" type="button" onClick={doDelete}>确认删除</mdui-button>
       </mdui-dialog>
     </section>
