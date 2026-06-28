@@ -20,3 +20,10 @@ export async function saveAttachment(file: File | null, id: string) {
   });
   return key;
 }
+
+export async function deleteAttachment(key: string | null) {
+  if (!key) return;
+  const env = await getCloudflareEnv();
+  if (!env.ASKBOX_R2) return;
+  await env.ASKBOX_R2.delete(key);
+}

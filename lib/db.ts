@@ -92,3 +92,12 @@ export async function answerQuestion(id: string, answer: string, publish: boolea
     [answer, publish ? "published" : "answered", publish ? 1 : 0, id]
   );
 }
+
+export async function deleteQuestion(id: string) {
+  await d1Query("DELETE FROM questions WHERE id = ?", [id]);
+}
+
+export async function getQuestion(id: string): Promise<Question | null> {
+  const rows = await d1Query<Question>("SELECT * FROM questions WHERE id = ?", [id]);
+  return rows[0] ?? null;
+}

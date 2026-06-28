@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { Question } from "@/lib/db";
 
 const filterLabels: Record<string, string> = {
@@ -14,6 +14,16 @@ export function AdminInbox() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [status, setStatus] = useState("pending");
   const [busy, setBusy] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const confirmRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = confirmRef.current;
+    if (!el) return;
+    const handler = () => setDeleteId(null);
+    el.addEventListener("close", handler);
+    return () => el.removeEventListener("close", handler);
+  }, []);
 
   async function load(nextStatus = status) {
     setBusy(true);
@@ -45,6 +55,13 @@ export function AdminInbox() {
     }
   }
 
+  async function doDelete() {
+    if (!deleteId) return;
+    setDeleteId(null);
+    const response = await fetch(`/api/questions/${deleteId}`, { method: "DELETE" });
+    if (response.ok) await load();
+  }
+
   return (
     <section className="admin-layout">
       <div className="row">
@@ -67,7 +84,7 @@ export function AdminInbox() {
 
       {questions.map((question) => (
         <article className="admin-card" key={question.id}>
-      <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
             <strong>{question.nickname || "匿名"}</strong>
             <span className="muted">{new Date(question.created_at?.replace(" ", "T") + "Z").toLocaleString()}</span>
           </div>
@@ -83,12 +100,21 @@ export function AdminInbox() {
           >
             <mdui-text-field name="answer" label="回答" rows="4" required />
             <mdui-checkbox name="publish" checked>发布到首页</mdui-checkbox>
-            <mdui-button type="submit">保存回答</mdui-button>
+            <div style={{display:"flex",gap:8,alignItems:"center"}}>
+              <mdui-button type="submit">保存回答</mdui-button>
+              <mdui-button type="button" onClick={() => setDeleteId(question.id)}>删除问题</mdui-button>
+            </div>
           </form>
         </article>
       ))}
 
       {!questions.length && !busy ? <p className="muted">这里暂时没有问题。</p> : null}
+
+      <mdui-dialog ref={confirmRef} open={deleteId !== null ? true : undefined} headline="确认删除">
+        <p>确定要删除这个问题吗？关联的图片附件也将被清除，此操作不可撤销。</p>
+        <mdui-button slot="action" type="button" onClick={() => setDeleteId(null)}>取消</mdui-button>
+        <mdui-button slot="action" type="button" onClick={doDelete}>确认删除</mdui-button>
+      </mdui-dialog>
     </section>
   );
 }
