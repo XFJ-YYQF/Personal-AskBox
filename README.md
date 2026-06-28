@@ -4,9 +4,9 @@
 
 ## 预览
 
-| 主页面 | 管理后台 | 搜索页面 |
+| 主页 | 管理后台 | 搜索页面 |
 |--------|----------|----------|
-| ![主页面](screenshots/主页面.png) | ![管理后台](screenshots/管理后台.png) | ![搜索页面](screenshots/搜索页面.png) |
+| ![主页](screenshots/主页.png) | ![管理后台](screenshots/管理后台.png) | ![搜索页面](screenshots/搜索页面.png) |
 
 ## 技术栈
 
