@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
 import { answerQuestion } from "@/lib/db";
 import { answerSchema } from "@/lib/validators";
+import { partialUpdateQuestion } from "@/lib/algolia-admin";
 
 export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   if (!(await isAdmin())) {
@@ -14,5 +15,10 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
   }
   const { id } = await context.params;
   await answerQuestion(id, parsed.data.answer, parsed.data.publish);
+  await partialUpdateQuestion(id, {
+    answer: parsed.data.answer,
+    status: parsed.data.publish ? "published" : "answered",
+    published_at: parsed.data.publish ? new Date().toISOString().replace("T", " ").slice(0, 19) : undefined,
+  });
   return NextResponse.json({ ok: true });
 }

@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import type { Question } from "@/lib/db";
 import { TimeDisplay } from "@/components/TimeDisplay";
+import { SearchBar } from "@/components/SearchBar";
 
 export function PublishedList({ questions }: { questions: Question[] }) {
   useEffect(() => {
@@ -11,7 +12,12 @@ export function PublishedList({ questions }: { questions: Question[] }) {
 
   return (
     <section className="published" aria-label="公开问答">
-      <h2>最近回答</h2>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+        <h2>最近回答</h2>
+        <div style={{minWidth:220,flex:1,maxWidth:360}}>
+          <SearchBar placeholder="搜索公开问题…" />
+        </div>
+      </div>
       {questions.map((question) => (
         <article className="question-card" key={question.id}>
           <p>{question.content}</p>

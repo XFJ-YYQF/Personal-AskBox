@@ -7,6 +7,7 @@ import { hitRateLimit } from "@/lib/rate-limit";
 import { saveAttachment } from "@/lib/r2";
 import { questionSchema } from "@/lib/validators";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { indexQuestion } from "@/lib/algolia-admin";
 
 function clientIp(request: NextRequest) {
   return request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
@@ -67,6 +68,17 @@ export async function POST(request: NextRequest) {
     ipHash,
     userAgent: request.headers.get("user-agent"),
     attachmentKey
+  });
+
+  await indexQuestion({
+    objectID: id,
+    nickname: parsed.data.nickname || null,
+    content: parsed.data.content,
+    answer: null,
+    status: "pending",
+    attachment_key: attachmentKey ?? null,
+    created_at: new Date().toISOString().replace("T", " ").slice(0, 19),
+    published_at: null
   });
 
   return NextResponse.json({ ok: true }, { status: 201 });
