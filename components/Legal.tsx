@@ -185,4 +185,4 @@ export function PrivacyContent() {
   );
 }
 
-export const LAST_UPDATED = "2026年7月1日";
+export const LAST_UPDATED = "2026年6月28日";
