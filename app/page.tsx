@@ -1,4 +1,5 @@
 import { AskForm } from "@/components/AskForm";
+import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PublishedList } from "@/components/PublishedList";
 import { listPublishedQuestions } from "@/lib/db";
@@ -25,6 +26,7 @@ export default async function HomePage() {
         </section>
         <PublishedList questions={questions} />
       </main>
+      <Footer />
     </>
   );
 }
