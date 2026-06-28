@@ -27,9 +27,9 @@ export function Footer() {
   return (
     <>
       <footer className="shell" style={{textAlign:"center",padding:"24px 0 32px",fontSize:"0.8rem",color:"rgb(var(--mdui-color-on-surface-variant))"}}>
-        <mdui-button type="button" onClick={() => setTermsOpen(true)}>用户协议</mdui-button>
+        <mdui-button variant="text" type="button" onClick={() => setTermsOpen(true)}>用户协议</mdui-button>
         <span style={{margin:"0 12px"}}>·</span>
-        <mdui-button type="button" onClick={() => setPrivacyOpen(true)}>隐私政策</mdui-button>
+        <mdui-button variant="text" type="button" onClick={() => setPrivacyOpen(true)}>隐私政策</mdui-button>
       </footer>
 
       <mdui-dialog ref={termsRef} open={termsOpen || undefined} headline="用户协议">
