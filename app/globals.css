@@ -140,6 +140,7 @@ a {
 .mdui-theme-light .admin-card,
 .mdui-theme-light mdui-card {
   background: #fff;
+  --mdui-color-surface: 255, 255, 255;
 }
 
 .mdui-theme-light {
@@ -153,6 +154,7 @@ a {
   .mdui-theme-auto .admin-card,
   .mdui-theme-auto mdui-card {
     background: #fff;
+    --mdui-color-surface: 255, 255, 255;
   }
 
   .mdui-theme-auto {
