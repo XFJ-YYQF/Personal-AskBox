@@ -135,6 +135,13 @@ a {
   gap: 12px;
 }
 
+.mdui-theme-light .panel,
+.mdui-theme-light .question-card,
+.mdui-theme-light .admin-card,
+.mdui-theme-light mdui-card {
+  background: #fff;
+}
+
 @media (max-width: 860px) {
   .hero {
     grid-template-columns: 1fr;
