@@ -142,6 +142,15 @@ a {
   background: #fff;
 }
 
+@media (prefers-color-scheme: light) {
+  .mdui-theme-auto .panel,
+  .mdui-theme-auto .question-card,
+  .mdui-theme-auto .admin-card,
+  .mdui-theme-auto mdui-card {
+    background: #fff;
+  }
+}
+
 @media (max-width: 860px) {
   .hero {
     grid-template-columns: 1fr;
