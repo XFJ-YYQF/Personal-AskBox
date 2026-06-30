@@ -94,7 +94,7 @@ export function AskForm({ siteKey }: { siteKey: string }) {
         <mdui-icon-alternate-email slot="icon"></mdui-icon-alternate-email>
       </mdui-text-field>
       <mdui-text-field name="content" label="想问什么？" variant="outlined" required rows="7" maxlength="1000" counter />
-      <mdui-divider></mdui-divider>
+      <mdui-divider style={{opacity:0}}></mdui-divider>
       <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={e => setFile(e.target.files?.[0] ?? null)} hidden />
       <mdui-button variant="outlined" full-width onClick={() => fileInputRef.current?.click()}>
         <mdui-icon-attachment slot="icon"></mdui-icon-attachment>
