@@ -13,7 +13,7 @@ export function PublishedList({ questions }: { questions: Question[] }) {
     <section className="published" aria-label="公开问答">
       <h2>最近回答</h2>
       {questions.map((question) => (
-        <article className="question-card" key={question.id}>
+        <mdui-card className="question-card" variant="elevated" clickable key={question.id}>
           <p>{question.content}</p>
           {question.attachment_key ? <p><img src={`/api/questions/${question.id}/attachment`} alt="附件图片" style={{maxWidth:"100%",maxHeight:320,borderRadius:8,objectFit:"contain"}} /></p> : null}
           <mdui-divider />
@@ -24,7 +24,7 @@ export function PublishedList({ questions }: { questions: Question[] }) {
             <mdui-icon-access-time style={{fontSize:16,verticalAlign:"middle"}}></mdui-icon-access-time>
             {" "}{question.published_at ? <TimeDisplay date={question.published_at} /> : ""}
           </p>
-        </article>
+        </mdui-card>
       ))}
       {!questions.length ? <p className="muted">还没有公开回答。</p> : null}
     </section>
