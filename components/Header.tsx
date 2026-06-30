@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { searchQuestions, type SearchResult } from "@/lib/algolia";
 import { siteName } from "@/lib/env";
+import { MarkdownContent } from "@/components/MarkdownContent";
 import Link from "next/link";
 
 type Theme = "auto" | "light" | "dark";
@@ -130,8 +131,8 @@ export function Header({ admin = false }: { admin?: boolean }) {
           <div style={{maxHeight:"50vh",overflowY:"auto"}}>
             {searchResults.map(r => (
               <div key={r.id} style={{padding:"10px 0",borderBottom:"1px solid rgb(var(--mdui-color-outline-variant))"}}>
-                <p style={{margin:"0 0 4px",fontWeight:500}}>{r.content}</p>
-                {r.answer ? <p style={{margin:"0 0 4px",fontSize:"0.875rem",color:"rgb(var(--mdui-color-on-surface-variant))"}}>{r.answer}</p> : null}
+                <p style={{margin:"0 0 4px",fontWeight:500}}><MarkdownContent text={r.content} /></p>
+                {r.answer ? <p style={{margin:"0 0 4px",fontSize:"0.875rem",color:"rgb(var(--mdui-color-on-surface-variant))"}}><MarkdownContent text={r.answer} /></p> : null}
                 <span style={{fontSize:"0.75rem",color:"rgb(var(--mdui-color-on-surface-variant))"}}>
                   {r.nickname || "匿名"} · {r.status === "published" ? (r.published_at ? new Date(r.published_at.replace(" ","T")+"Z").toLocaleDateString() : "") : r.status}
                 </span>

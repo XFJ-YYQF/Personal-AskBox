@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { searchQuestions, type SearchResult } from "@/lib/algolia";
 import { useSearchParams, useRouter } from "next/navigation";
 import { TimeDisplay } from "@/components/TimeDisplay";
+import { MarkdownContent } from "@/components/MarkdownContent";
 
 export function SearchView() {
   const params = useSearchParams();
@@ -88,10 +89,10 @@ export function SearchView() {
                   background: "rgb(var(--mdui-color-surface-container))",
                 }}
               >
-                <p style={{ margin: "0 0 8px", fontWeight: 500 }}>{r.content}</p>
+                <p style={{ margin: "0 0 8px", fontWeight: 500 }}><MarkdownContent text={r.content} /></p>
                 {r.answer ? (
                   <p style={{ margin: "0 0 8px", fontSize: "0.875rem", color: "rgb(var(--mdui-color-on-surface-variant))" }}>
-                    {r.answer}
+                    <MarkdownContent text={r.answer} />
                   </p>
                 ) : null}
                 <span style={{ fontSize: "0.75rem", color: "rgb(var(--mdui-color-on-surface-variant))" }}>

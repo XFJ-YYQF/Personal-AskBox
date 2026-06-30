@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import type { Question } from "@/lib/db";
 import { TimeDisplay } from "@/components/TimeDisplay";
+import { MarkdownContent } from "@/components/MarkdownContent";
 
 export function PublishedList({ questions }: { questions: Question[] }) {
   const [snackMessage, setSnackMessage] = useState("");
@@ -38,10 +39,10 @@ export function PublishedList({ questions }: { questions: Question[] }) {
           key={question.id}
           onClick={() => copyCard(question)}
         >
-          <p><mdui-icon-question-mark style={{fontSize:18,verticalAlign:"middle"}}></mdui-icon-question-mark>{" "}{question.content}</p>
+          <p><mdui-icon-question-mark style={{fontSize:18,verticalAlign:"middle"}}></mdui-icon-question-mark> <MarkdownContent text={question.content} /></p>
           {question.attachment_key ? <p><img src={`/api/questions/${question.id}/attachment`} alt="附件图片" style={{maxWidth:"100%",maxHeight:320,borderRadius:8,objectFit:"contain"}} /></p> : null}
           <mdui-divider />
-          <p><mdui-icon-question-answer style={{fontSize:18,verticalAlign:"middle"}}></mdui-icon-question-answer>{" "}{question.answer}</p>
+          <p><mdui-icon-question-answer style={{fontSize:18,verticalAlign:"middle"}}></mdui-icon-question-answer> <MarkdownContent text={question.answer!} /></p>
           <p className="muted">
             <mdui-icon-alternate-email style={{fontSize:16,verticalAlign:"middle"}}></mdui-icon-alternate-email>
             {" "}{question.nickname || "匿名"}{" · "}

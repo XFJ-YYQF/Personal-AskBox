@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import type { Question } from "@/lib/db";
+import { MarkdownContent } from "@/components/MarkdownContent";
 
 const filterLabels: Record<string, string> = {
   pending: "待回答",
@@ -93,9 +94,9 @@ export function AdminInbox() {
             <strong>{question.nickname || "匿名"}</strong>
             <span className="muted">{new Date(question.created_at?.replace(" ", "T") + "Z").toLocaleString()}</span>
           </div>
-          <p>{question.content}</p>
+          <p><MarkdownContent text={question.content} /></p>
           {question.attachment_key ? <p><img src={`/api/questions/${question.id}/attachment`} alt="附件图片" style={{maxWidth:"100%",maxHeight:320,borderRadius:8,objectFit:"contain"}} /></p> : null}
-          {question.answer ? <p className="muted">已答：{question.answer}</p> : null}
+          {question.answer ? <p className="muted">已答：<MarkdownContent text={question.answer} /></p> : null}
           <form
             className="form-stack"
             onSubmit={(event) => {

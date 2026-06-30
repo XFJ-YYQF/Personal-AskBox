@@ -19,6 +19,7 @@
     "@mdui/icons": "1.0.2",
     "@opennextjs/cloudflare": "1.19.11",
     "algoliasearch": "^5.55.1",
+    "marked": "^18.0.5",
     "mdui": "2.1.4",
     "nanoid": "5.1.5",
     "next": "15.5.19",
