@@ -140,6 +140,12 @@ a {
 .mdui-theme-light .admin-card,
 .mdui-theme-light mdui-card {
   background: #fff;
+}
+
+.mdui-theme-light .panel mdui-text-field,
+.mdui-theme-light .question-card mdui-text-field,
+.mdui-theme-light .admin-card mdui-text-field,
+.mdui-theme-light mdui-card mdui-text-field {
   --mdui-color-surface: 255, 255, 255;
 }
 
@@ -154,6 +160,12 @@ a {
   .mdui-theme-auto .admin-card,
   .mdui-theme-auto mdui-card {
     background: #fff;
+  }
+
+  .mdui-theme-auto .panel mdui-text-field,
+  .mdui-theme-auto .question-card mdui-text-field,
+  .mdui-theme-auto .admin-card mdui-text-field,
+  .mdui-theme-auto mdui-card mdui-text-field {
     --mdui-color-surface: 255, 255, 255;
   }
 
@@ -161,6 +173,22 @@ a {
     --mdui-color-surface: 250, 248, 252;
     --mdui-color-surface-container-low: 245, 242, 248;
   }
+}
+
+@media (prefers-color-scheme: dark) {
+  .mdui-theme-auto .panel mdui-text-field,
+  .mdui-theme-auto .question-card mdui-text-field,
+  .mdui-theme-auto .admin-card mdui-text-field,
+  .mdui-theme-auto mdui-card mdui-text-field {
+    --mdui-color-surface: var(--mdui-color-surface-container-low);
+  }
+}
+
+.mdui-theme-dark .panel mdui-text-field,
+.mdui-theme-dark .question-card mdui-text-field,
+.mdui-theme-dark .admin-card mdui-text-field,
+.mdui-theme-dark mdui-card mdui-text-field {
+  --mdui-color-surface: var(--mdui-color-surface-container-low);
 }
 
 @media (max-width: 860px) {
