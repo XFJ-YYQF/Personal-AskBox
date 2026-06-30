@@ -1,9 +1,12 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { Question } from "@/lib/db";
 import { TimeDisplay } from "@/components/TimeDisplay";
 
 export function PublishedList({ questions }: { questions: Question[] }) {
+  const [snackMessage, setSnackMessage] = useState("");
+  const snackRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     import("@mdui/icons/alternate-email.js");
     import("@mdui/icons/access-time.js");
@@ -11,11 +14,29 @@ export function PublishedList({ questions }: { questions: Question[] }) {
     import("@mdui/icons/question-answer.js");
   }, []);
 
+  useEffect(() => {
+    if (!snackMessage) return;
+    const el = snackRef.current;
+    if (el && "show" in el) (el as any).show();
+  }, [snackMessage]);
+
+  async function copyCard(question: Question) {
+    const text = `Q: ${question.content}\nA: ${question.answer}`;
+    await navigator.clipboard.writeText(text);
+    setSnackMessage("已复制到剪贴板");
+  }
+
   return (
     <section className="published" aria-label="公开问答">
       <h2>最近回答</h2>
       {questions.map((question) => (
-        <mdui-card className="question-card" variant="elevated" clickable key={question.id}>
+        <mdui-card
+          className="question-card"
+          variant="elevated"
+          clickable
+          key={question.id}
+          onClick={() => copyCard(question)}
+        >
           <p><mdui-icon-question-mark style={{fontSize:18,verticalAlign:"middle"}}></mdui-icon-question-mark>{" "}{question.content}</p>
           {question.attachment_key ? <p><img src={`/api/questions/${question.id}/attachment`} alt="附件图片" style={{maxWidth:"100%",maxHeight:320,borderRadius:8,objectFit:"contain"}} /></p> : null}
           <mdui-divider />
@@ -29,6 +50,7 @@ export function PublishedList({ questions }: { questions: Question[] }) {
         </mdui-card>
       ))}
       {!questions.length ? <p className="muted">还没有公开回答。</p> : null}
+      <mdui-snackbar ref={snackRef} message={snackMessage} />
     </section>
   );
 }
