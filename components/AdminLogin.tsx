@@ -29,7 +29,8 @@ export function AdminLogin() {
   }
 
   return (
-    <form className="panel form-stack" onSubmit={submit}>
+    <mdui-card className="panel" variant="elevated">
+    <form className="form-stack" onSubmit={submit}>
       <mdui-text-field disabled label="账号" value="Admin">
         <mdui-icon-account-circle slot="icon"></mdui-icon-account-circle>
       </mdui-text-field>
@@ -41,5 +42,6 @@ export function AdminLogin() {
       </mdui-button>
       {error ? <p style={{color:"rgb(var(--mdui-color-error,179,38,30))",margin:0}}>{error}</p> : null}
     </form>
+    </mdui-card>
   );
 }
