@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "node scripts/next.mjs dev",
     "build": "node scripts/next.mjs build",
@@ -10,7 +13,7 @@
     "lint": "next lint",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare build && wrangler dev",
-    "cf:deploy": "opennextjs-cloudflare build && wrangler deploy --domain askbox.nekro.top",
+    "cf:deploy": "opennextjs-cloudflare build && wrangler deploy",
     "db:local": "wrangler d1 execute askbox-db --local --file=./db/schema.sql",
     "db:remote": "wrangler d1 execute askbox-db --remote --file=./db/schema.sql"
   },

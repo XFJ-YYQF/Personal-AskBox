@@ -137,7 +137,39 @@ Cloudflare Workers（不同于 Pages）目前无法做到"资源 ID 完全只存
 > 如果改用 Cloudflare 的 Git 集成（Workers Builds）自动构建部署，控制台的
 > 变量在构建阶段也会被注入，届时这几个值同样可以只在控制台配置。
 
-## 功能特性
+## 从 GitHub 自动部署（Cloudflare Workers Builds）
+
+如果代码托管在 GitHub，可以让 Cloudflare Workers 直接连接仓库，push 后自动构建部署，不需要在本机跑 `wrangler deploy`。
+
+### 首次连接
+
+1. 先按上面「手动部署」的步骤 1-4 在本机跑通一次（`cp .env.example .env.local`、创建/绑定 D1·KV·R2、初始化数据库、设置 Secret），确保 `wrangler.jsonc` 里的资源 ID 已经是真实值，并执行一次 `npm run cf:deploy` 完成首次部署——Worker 需要先存在，Git 集成才能连接。
+2. 代码 push 到 GitHub。
+3. Cloudflare 控制台 → **Workers & Pages** → 选中刚才部署出来的 `personal-askbox` 这个 Worker → **Settings → Builds → Connect**。
+4. 选择 GitHub，授权后选中这个仓库和生产分支（一般是 `main`）。
+5. **Build configuration**：
+   - Root directory：仓库根目录（`wrangler.jsonc` 所在目录）
+   - Build command：留空（构建已经包含在下面的部署命令里）
+   - Deploy command：`npm run cf:deploy`
+   - 非生产分支的预览部署命令可以留默认 `npx wrangler versions upload`
+
+### 配置变量（构建期 + 运行时都在控制台完成）
+
+用这种方式部署时，Worker「设置 → 变量和密钥」里配置的变量，在构建阶段和运行时都会生效，所以：
+
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`、`NEXT_PUBLIC_ALGOLIA_APP_ID`、
+  `NEXT_PUBLIC_ALGOLIA_SEARCH_ONLY_API_KEY`、`NEXT_PUBLIC_ALGOLIA_INDEX` —
+  填成「文本」类型，之前"必须留在本地 .env.local"的限制在这种部署方式下不存在了。
+- `SESSION_SECRET`、`ADMIN_PASSWORD`（或 `ADMIN_PASSWORD_HASH`）、
+  `TURNSTILE_SECRET_KEY`、`ALGOLIA_ADMIN_API_KEY` — 填成「密钥」类型。
+
+保存后，去仓库随便 push 一个 commit（或在 Builds 页面点 **Retry build**）触发一次构建，让新变量生效。之后每次 push 到生产分支都会自动重新构建部署。
+
+### 自定义域名
+
+如果要绑定自己的域名，去 Worker 的 **设置 → 域和路由 → 添加自定义域**，输入域名即可，不需要再改 `wrangler.jsonc` 或部署脚本。
+
+
 
 - **匿名提问**：支持公开昵称或匿名留言，可附带图片附件（PNG/JPG/WebP/GIF）
 - **全文搜索**：基于 Algolia 的实时搜索，前台搜公开问题，后台搜全部（**可选功能**，见下方配置）
