@@ -11,13 +11,17 @@
   "observability": {
     "enabled": true
   },
-  "vars": {
-    "SITE_NAME": "个人提问箱",
-    "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAADq_TbFIo0fHRcu3",
-    "NEXT_PUBLIC_ALGOLIA_APP_ID": "FF78XADSJ7",
-    "NEXT_PUBLIC_ALGOLIA_SEARCH_ONLY_API_KEY": "e6fd0162fb754ba22e033739da33cb37",
-    "NEXT_PUBLIC_ALGOLIA_INDEX": "askbox"
-  },
+  // keep_vars: true 让 `wrangler deploy` 不再用本文件覆盖你在 Cloudflare
+  // 控制台「设置 -> 变量和密钥」里配置的值。所有服务端变量/密钥都不再写在
+  // 这里，改为在控制台填写（首次部署前控制台里还没有 Worker，可以先随便
+  // 部署一次占位，再去控制台补变量，然后重新部署一次即可生效）。
+  "keep_vars": true,
+  // D1 / KV / R2 的资源 ID 仍需写在这里（Cloudflare Workers 与 Pages 不同，
+  // 无法做到"完全只在控制台绑定、代码里不出现资源 ID"——只要还用
+  // `wrangler deploy` 部署，每次部署都会用本文件里的绑定覆盖控制台的绑定）。
+  // 推荐流程：先在控制台的 Storage & Databases 里创建/找到 D1、KV、R2 资源，
+  // 把 ID 抄到下面，而不是用命令行创建；后续也可以在 Worker 的
+  // 「设置 -> 绑定」页面里直接看到并管理这些绑定。
   "d1_databases": [
     {
       "binding": "DB",

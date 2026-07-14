@@ -92,6 +92,51 @@ npm run cf:deploy
 
 部署成功后会输出 `https://xxx.workers.dev` 访问地址。
 
+## 在 Cloudflare 控制台配置绑定与变量
+
+`wrangler.jsonc` 已经加了 `"keep_vars": true`，并且不再包含任何 `vars`，所以除了
+`NEXT_PUBLIC_*` 这几个"编译期"变量（见下方说明），其余配置都可以只在
+Cloudflare 控制台里填写，不用碰 `.env.local` 或改代码。
+
+### D1 / KV / R2 绑定
+
+Cloudflare Workers（不同于 Pages）目前无法做到"资源 ID 完全只存在于控制台、
+仓库里一点不出现"——只要还用 `wrangler deploy` / `npm run cf:deploy` 部署，
+每次部署都会以 `wrangler.jsonc` 里声明的绑定为准，覆盖你在控制台"设置 ->
+绑定"页面里手动改动的内容。所以推荐这样操作：
+
+1. 在控制台 **Storage & Databases** 里创建（或使用已有的）D1 数据库、KV 命名空间、
+   R2 存储桶，而不是用 `npx wrangler d1 create` 等命令。
+2. 把创建后拿到的 `database_id` / KV `id` / R2 桶名，填进 `wrangler.jsonc` 的
+   `d1_databases` / `kv_namespaces` / `r2_buckets` 里（binding 名字必须分别是
+   `DB`、`ASKBOX_KV`、`ASKBOX_R2`，代码里是按这几个名字读取的）。
+3. 部署一次之后，去 Worker 的 **设置 -> 绑定** 页面就能看到这三个绑定，可以在
+   那里直接浏览 D1 表数据、KV 键值、R2 文件，方便调试；但如果要*修改*绑定指向的
+   资源，还是要改 `wrangler.jsonc` 再重新部署，控制台里的临时改动会在下次部署时被覆盖。
+
+### 变量与密钥
+
+去 Worker 的 **设置 -> 变量和密钥**（Variables and Secrets），按下表添加：
+
+| 名称 | 类型 | 说明 |
+|------|------|------|
+| `SESSION_SECRET` | 密钥 (Secret) | 会话签名密钥 |
+| `ADMIN_PASSWORD` 或 `ADMIN_PASSWORD_HASH` | 密钥 (Secret) | 管理员密码 / 密码哈希 |
+| `TURNSTILE_SECRET_KEY` | 密钥 (Secret) | Turnstile 服务端密钥 |
+| `ALGOLIA_ADMIN_API_KEY` | 密钥 (Secret) | 仅使用 Algolia 搜索时需要 |
+| `SITE_NAME` | 文本 (Variable) | 站点名称，可选 |
+
+保存后无需改代码，`getCloudflareEnv()` / `getEnv()` 会在运行时自动读到这些值，
+且因为 `keep_vars: true`，之后每次 `npm run cf:deploy` 都不会把它们清空。
+
+> **`NEXT_PUBLIC_*` 例外**：`NEXT_PUBLIC_TURNSTILE_SITE_KEY`、
+> `NEXT_PUBLIC_ALGOLIA_APP_ID`、`NEXT_PUBLIC_ALGOLIA_SEARCH_ONLY_API_KEY`、
+> `NEXT_PUBLIC_ALGOLIA_INDEX` 会被 Next.js 在**构建期**直接打进浏览器端代码，
+> 而不是在 Worker 运行时读取。如果你在本机执行 `npm run cf:deploy`，这几个值
+> 必须写在本机的 `.env.local` 里才会生效；只填在控制台里对本机构建不起作用。
+> 如果改用 Cloudflare 的 Git 集成（Workers Builds）自动构建部署，控制台的
+> 变量在构建阶段也会被注入，届时这几个值同样可以只在控制台配置。
+
 ## 功能特性
 
 - **匿名提问**：支持公开昵称或匿名留言，可附带图片附件（PNG/JPG/WebP/GIF）
@@ -119,10 +164,9 @@ Index 名称是 askbox。
 ```
 
 Agent 会自动完成：
-1. 在 `.env.local` 中添加四项 Algolia 环境变量
-2. 更新 `wrangler.jsonc` 的 `vars` 中添加三项公开变量
-3. 通过 `wrangler secret put` 设置 `ALGOLIA_ADMIN_API_KEY`
-4. 执行 `npm run cf:deploy` 重新部署
+1. 在 `.env.local` 中添加四项 Algolia 环境变量（`NEXT_PUBLIC_*` 三项是构建期变量，必须留在这里）
+2. 在 Cloudflare 控制台「设置 -> 变量和密钥」中把 `ALGOLIA_ADMIN_API_KEY` 加为 Secret
+3. 执行 `npm run cf:deploy` 重新部署
 
 你也可以在同一句话里指定其他的 Index 名称。
 
@@ -141,30 +185,22 @@ Agent 会自动完成：
 
 #### 3. 配置环境变量
 
-在 `.env.local` 中添加：
+`NEXT_PUBLIC_*` 三项会被打进浏览器端代码，必须写进本机的 `.env.local`
+（部署时执行构建的机器也需要有这几个值）：
 
 ```env
 NEXT_PUBLIC_ALGOLIA_APP_ID="你的 Application ID"
 NEXT_PUBLIC_ALGOLIA_SEARCH_ONLY_API_KEY="你的 Search-Only API Key"
 NEXT_PUBLIC_ALGOLIA_INDEX="askbox"
-ALGOLIA_ADMIN_API_KEY="你的 Admin API Key"
 ```
 
-#### 4. 更新 wrangler.jsonc
+`ALGOLIA_ADMIN_API_KEY` 是服务端密钥，**不要**写进 `.env.local` 或
+`wrangler.jsonc`，改为在 Cloudflare 控制台配置。
 
-在 `wrangler.jsonc` 的 `vars` 中添加三项公开变量（Admin Key 通过 secret 设置，**不要写进文件**）：
+#### 4. 在控制台设置 Admin API Key
 
-```json
-{
-  "vars": {
-    "NEXT_PUBLIC_ALGOLIA_APP_ID": "你的 Application ID",
-    "NEXT_PUBLIC_ALGOLIA_SEARCH_ONLY_API_KEY": "你的 Search-Only API Key",
-    "NEXT_PUBLIC_ALGOLIA_INDEX": "askbox"
-  }
-}
-```
-
-#### 5. 设置 Admin API Key 为 Secret
+去 Worker 的 **设置 -> 变量和密钥**，添加一个类型为「密钥」的
+`ALGOLIA_ADMIN_API_KEY`，值为你的 Admin API Key。也可以用命令行代替：
 
 ```bash
 echo '你的 Admin API Key' | npx wrangler secret put ALGOLIA_ADMIN_API_KEY
