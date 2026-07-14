@@ -26,13 +26,13 @@
     {
       "binding": "DB",
       "database_name": "askbox-db",
-      "database_id": "ea778314-7efa-497e-ac90-889146e676ef"
+      "database_id": "3ae0e582-6ec6-49bb-90a7-d5f799de2685"
     }
   ],
   "kv_namespaces": [
     {
-      "binding": "ASKBOX_KV",
-      "id": "3db16436976143fc96b862dcb922162a"
+      "binding": "KV_BINDING",
+      "id": "a8ffcf34e7864ecf9440e1b25964244b"
     }
   ],
   "r2_buckets": [
